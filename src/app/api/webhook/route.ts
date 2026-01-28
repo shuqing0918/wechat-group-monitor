@@ -3,7 +3,7 @@ import { notificationManager } from '@/storage/database/notificationManager';
 import { weWorkNotificationService } from '@/services/weWorkNotificationService';
 
 // 关键字配置
-const KEYWORDS = ['人找车'];
+const KEYWORDS = ['车'];
 
 // Webhook 请求类型（企业微信机器人）
 interface WebhookMessage {
