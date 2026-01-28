@@ -1,401 +1,324 @@
-# 🚀 微信群监听系统部署指南
+# 🚀 部署指南
 
-本指南将帮助你快速部署微信群监听系统到 Vercel（免费）。
+## 项目概述
+
+这是一个微信群消息监听系统，通过企业微信 Webhook 接收群消息，检测关键字后通过企业微信应用发送通知。
+
+**核心功能：**
+- 接收企业微信群机器人 Webhook 消息
+- 检测消息中的关键字（如"人找车"）
+- 通过企业微信应用 API 发送文本通知
+- 通知历史记录与统计
+
+---
 
 ## 📋 部署前准备
 
-### 必备条件
-- ✅ GitHub 账号（免费）
-- ✅ Vercel 账号（免费）
-- ✅ 企业微信账号（免费）
+### 1. 环境变量配置
 
-### 可选条件
-- 📱 微信小程序账号（用于后续扩展）
+在部署平台（Vercel / 本地）配置以下环境变量：
+
+| 环境变量 | 说明 | 示例 |
+|---------|------|------|
+| `DATABASE_URL` | PostgreSQL 数据库连接地址 | `postgresql://user:password@host:port/dbname` |
+| `WEWORK_CORP_ID` | 企业微信 Corp ID | `ww1234567890abcdef` |
+| `WEWORK_AGENT_ID` | 企业应用 Agent ID | `123456` |
+| `WEWORK_AGENT_SECRET` | 企业应用 Secret | `abc123xyz789` |
+
+#### 如何获取企业微信配置信息：
+
+1. **Corp ID**：
+   - 登录企业微信管理后台：https://work.weixin.qq.com/
+   - 进入"我的企业" → "企业信息" → "企业ID"
+
+2. **Agent ID 和 Agent Secret**：
+   - 进入"应用管理" → 创建或选择一个应用
+   - 在应用详情页面查看"AgentId"
+   - 在"凭证与基础信息"中查看"Secret"（需要企业微信管理员扫码）
+
+3. **成员 UserID**：
+   - 进入"通讯录" → 选择成员
+   - 在成员详情页面查看"帐号"（即 UserID）
+
+**未配置环境变量：**
+- 系统仍可正常运行
+- 企业微信通知功能将进入模拟模式（仅输出控制台日志）
 
 ---
 
-## 🌟 方案概述
+### 2. Vercel 部署
 
-```
-普通微信群 → 企业微信群机器人 → Vercel 后端 → 浏览器/小程序
-                                                  ↓
-                                              短信通知
-```
+#### 方式一：通过 Vercel CLI（推荐）
 
-### 优点
-- ✅ 完全免费
-- ✅ 自动 HTTPS
-- ✅ 无需服务器
-- ✅ 无需域名
-- ✅ 自动部署
-
----
-
-## 📦 第一步：部署到 Vercel
-
-### 1.1 注册 Vercel 账号
-
-1. 访问 https://vercel.com
-2. 点击 "Sign Up" 注册
-3. 选择使用 GitHub 账号登录
-4. 完成注册（免费）
-
-### 1.2 创建 GitHub 仓库
-
-1. 在本地项目目录执行：
+1. 安装 Vercel CLI：
 ```bash
-git init
-git add .
-git commit -m "Initial commit"
+pnpm add -g vercel
 ```
 
-2. 在 GitHub 创建新仓库（名称如：wechat-group-monitor）
-3. 推送代码到 GitHub：
+2. 登录 Vercel：
 ```bash
-git remote add origin https://github.com/你的用户名/wechat-group-monitor.git
-git branch -M main
-git push -u origin main
+vercel login
 ```
 
-### 1.3 在 Vercel 导入项目
+3. 部署项目：
+```bash
+vercel
+```
 
-1. 登录 Vercel 控制台：https://vercel.com/dashboard
-2. 点击 "Add New" → "Project"
-3. 选择刚才创建的 GitHub 仓库
-4. 点击 "Import"
+4. 按提示配置：
+   - 选择创建新项目或链接到现有项目
+   - 配置项目名称
+   - 添加环境变量（见上方表格）
 
-### 1.4 配置项目
+5. 部署成功后，Vercel 会提供一个生产 URL，例如：
+   ```
+   https://your-app.vercel.app
+   ```
 
-在 Vercel 项目配置页面：
+#### 方式二：通过 GitHub（推荐用于团队协作）
 
-**Framework Preset**: Next.js
+1. 将代码推送到 GitHub 仓库
 
-**Environment Variables**（环境变量）：
-暂时不需要，当前应用不需要配置额外的环境变量
+2. 在 Vercel 控制台导入项目：
+   - 访问 https://vercel.com/
+   - 点击 "Add New" → "Project"
+   - 选择 GitHub 仓库
 
-**Build and Output Settings**：
-- Build Command: `pnpm run build`
-- Output Directory: `.next`
-- Install Command: `pnpm install`
+3. 配置环境变量：
+   - 在项目设置中添加所有环境变量
 
-点击 "Deploy" 开始部署。
-
-### 1.5 等待部署完成
-
-- 部署通常需要 1-3 分钟
-- 部署成功后会显示一个 `.vercel.app` 域名
-- 例如：`https://wechat-group-monitor.vercel.app`
-
-**记录你的域名**，后面需要用到！
+4. 部署：
+   - Vercel 会自动检测 Next.js 项目并部署
+   - 每次推送代码会自动重新部署
 
 ---
 
-## 🤖 第二步：配置企业微信群机器人
+## 📡 企业微信配置
 
-### 2.1 在目标微信群中添加机器人
+### 步骤 1：创建企业微信应用
 
-1. 打开你要监听的微信群
-2. 点击群聊右上角的 "..."
-3. 找到 "群机器人" 或 "群工具"
-4. 点击 "添加机器人"
-5. 选择 "自定义机器人"
-6. 给机器人命名（如：消息监听机器人）
-7. 点击 "添加"
+1. 登录企业微信管理后台：https://work.weixin.qq.com/
+2. 进入"应用管理"
+3. 点击"创建应用"或选择现有应用
+4. 填写应用信息：
+   - 应用名称：微信群监听
+   - 应用介绍：监听微信群消息并发送通知
+5. 保存并获取 Agent ID 和 Secret
 
-### 2.2 获取 Webhook URL
+### 步骤 2：配置接收消息 Webhook
 
-添加成功后，你会看到一个 Webhook URL，格式类似：
-```
-https://qyapi.weixin.qq.com/cgi-bin/webhook/send?key=xxxxx
-```
+1. 在应用详情页面，找到"接收消息"配置
+2. 启用"API 接收"
+3. 配置回调 URL：
+   - 如果是 Vercel 部署：`https://your-app.vercel.app/api/webhook`
+   - 如果是本地部署：`http://localhost:5000/api/webhook`
+4. 设置 Token 和 EncodingAESKey（可随机生成）
+5. 保存后，企业微信会发送验证请求，确保 Webhook 接口正常
 
-**重要**：复制这个 URL，后面需要用到！
+### 步骤 3：配置应用权限
 
-### 2.3 配置机器人转发（关键步骤）
+1. 在应用详情页面，找到"应用权限"
+2. 授予以下权限：
+   - `推送消息`：允许向成员发送应用消息
+   - `企业通讯录`：允许获取成员信息（如果需要）
 
-企业微信群机器人**不能直接**向外部 Webhook 发送消息。
+### 步骤 4：将应用添加到微信群
 
-**解决方案**：使用企业微信的"消息推送"功能。
+1. 在企业微信客户端中，找到要监听的微信群
+2. 进入群设置 → "群机器人" → "添加机器人"
+3. 选择刚创建的应用
+4. 复制 Webhook URL（可选，当前项目不使用此 Webhook）
 
-#### 选项 A：使用企业微信应用（推荐）
-
-1. 登录企业微信管理后台：https://work.weixin.qq.com
-2. 进入"应用管理" → "自建应用"
-3. 创建一个新应用（名称：群消息监听）
-4. 配置应用的"接收消息"回调 URL：
-   - 回调 URL：`https://你的vercel域名/api/webhook`
-   - Token 和 EncodingAESKey：随机生成并记录
-5. 启用"接收消息"功能
-
-#### 选项 B：使用第三方转发服务（简单）
-
-如果选项 A 太复杂，可以使用企业微信的"外部联系人"功能：
-1. 将机器人配置为向特定外部联系人发送消息
-2. 外部联系人通过 Webhook 接收消息
-3. 推送到你的 Vercel 后端
+**重要说明：**
+- 当前项目通过企业微信应用接收消息，而非群机器人
+- 群机器人 Webhook 用于接收群消息
+- 应用 API 用于发送通知
 
 ---
 
-## 🔗 第三步：配置 Webhook 连接
+## 🧪 本地开发
 
-### 3.1 确认你的 Vercel 域名
+### 1. 克隆项目并安装依赖
 
-部署完成后，Vercel 会提供一个域名，例如：
-```
-https://wechat-group-monitor.vercel.app
-```
-
-### 3.2 配置企业微信应用回调 URL
-
-1. 登录企业微信管理后台
-2. 进入你创建的应用
-3. 找到"接收消息"设置
-4. 设置回调 URL：`https://你的域名/api/webhook`
-5. 保存配置
-
-### 3.3 测试连接
-
-在浏览器访问：
-```
-https://你的域名/api/webhook
+```bash
+cd /workspace/projects/
+coze init . --template nextjs
 ```
 
-应该看到：
+### 2. 配置本地环境变量
+
+创建 `.env.local` 文件：
+
+```bash
+# 数据库连接（本地开发可以使用 Supabase 免费数据库）
+DATABASE_URL="postgresql://user:password@localhost:5432/wechat_monitor"
+
+# 企业微信配置（可选，不配置会使用模拟模式）
+WEWORK_CORP_ID="your_corp_id"
+WEWORK_AGENT_ID="your_agent_id"
+WEWORK_AGENT_SECRET="your_agent_secret"
+```
+
+### 3. 初始化数据库
+
+```bash
+pnpm install
+pnpm db:push
+```
+
+### 4. 启动开发服务器
+
+```bash
+pnpm dev
+```
+
+访问 http://localhost:5000
+
+---
+
+## ✅ 验证部署
+
+### 1. 验证 Webhook 接口
+
+使用 curl 测试 Webhook：
+
+```bash
+curl -X POST http://localhost:5000/api/webhook \
+  -H "Content-Type: application/json" \
+  -d '{
+    "msgtype": "text",
+    "text": {
+      "content": "人找车：今天下午从北京到上海，有人顺路吗？"
+    }
+  }'
+```
+
+预期响应：
+
 ```json
 {
-  "status": "running",
-  "keywords": ["人找车"],
-  "message": "微信群监听 Webhook 服务运行中",
-  "timestamp": "2026-01-28T06:00:00.000Z"
+  "success": true,
+  "message": "检测到关键字，已发送通知",
+  "keyword": "人找车",
+  "detectedAt": "2024-01-01T12:00:00.000Z"
 }
 ```
 
----
+### 2. 验证企业微信通知
 
-## 📱 第四步：使用系统
+1. 在应用配置页面，添加接收人 UserID
+2. 发送测试消息（包含"人找车"关键字）
+3. 检查企业微信客户端是否收到通知
 
-### 4.1 访问应用
+**未配置环境变量：**
+- Webhook 接口正常响应
+- 企业微信通知仅在控制台输出日志
+- 日志格式：
+  ```
+  [模拟模式] 企业微信通知（仅控制台日志）
+  接收人: user1, user2
+  消息内容: 检测到关键字"人找车": 人找车：今天下午从北京到上海，有人顺路吗？
+  ```
 
-打开浏览器，访问：
-```
-https://你的域名
-```
+### 3. 验证数据库连接
 
-你会看到：
-- 📊 统计概览（总通知数、已通知、待处理）
-- 📱 短信通知配置
-- 🧪 短信测试
-- 📡 Webhook 配置说明
-- 🔍 关键字检测测试
-- 📋 通知记录列表
+访问以下接口：
 
-### 4.2 配置短信手机号
-
-1. 在"短信通知配置"卡片中
-2. 输入 11 位手机号
-3. 点击"添加"
-4. 可以添加多个手机号
-
-### 4.3 测试关键字检测
-
-1. 在"关键字检测测试"卡片中
-2. 输入测试消息（必须包含"人找车"）
-3. 点击"发送测试"
-4. 查看"通知记录"列表，会新增一条记录
-
-### 4.4 测试短信发送
-
-1. 在"短信测试"卡片中
-2. 输入测试手机号
-3. 输入测试内容
-4. 点击"发送测试短信"
-5. 查看控制台日志（当前为模拟模式）
-
----
-
-## 🔔 第五步：监听微信群消息
-
-### 5.1 确保企业微信应用配置正确
-
-1. 企业微信应用的回调 URL 已设置
-2. 应用已启用"接收消息"功能
-3. 应用已添加到要监听的微信群
-
-### 5.2 在群中发送测试消息
-
-在目标微信群中发送：
-```
-人找车：今天下午从北京到上海，有人顺路吗？
-```
-
-### 5.3 查看通知记录
-
-刷新应用页面，"通知记录"列表应该会新增一条记录，包含：
-- 消息内容
-- 关键字（人找车）
-- 来源（企业微信）
-- 创建时间
-
----
-
-## 📊 API 接口说明
-
-### Webhook 接收消息
-```
-POST /api/webhook
-```
-
-### 获取通知列表
-```
-GET /api/notifications?limit=20
-```
-
-### 获取统计数据
-```
-GET /api/notifications/stats
-```
-
-### 设置手机号
-```
-POST /api/configs/sms-phone-numbers
-Content-Type: application/json
-
-{
-  "phoneNumbers": ["13800138000", "13900139000"]
-}
-```
-
-### 发送测试短信
-```
-POST /api/sms/test
-Content-Type: application/json
-
-{
-  "phoneNumbers": ["13800138000"],
-  "content": "【测试】这是一条测试短信"
-}
-```
-
----
-
-## ⚠️ 重要提示
-
-### 关于短信服务
-- ⚠️ 当前短信服务为**模拟模式**
-- ⚠️ 短信不会实际发送，只在控制台输出日志
-- ✅ 如需发送真实短信，需要接入第三方短信服务（阿里云/腾讯云）
-
-### 接入真实短信服务
-
-修改 `src/services/smsService.ts`，在 `sendSMS` 方法中接入第三方短信服务：
-
-#### 阿里云短信示例
-
-1. 安装依赖：
 ```bash
-pnpm add @alicloud/dysmsapi
+curl http://localhost:5000/api/notifications
 ```
 
-2. 配置环境变量：
-```bash
-# 在 Vercel 项目设置中添加
-ALIYUN_ACCESS_KEY_ID=your_key_id
-ALIYUN_ACCESS_KEY_SECRET=your_key_secret
-ALIYUN_SMS_SIGN_NAME=你的签名
-ALIYUN_SMS_TEMPLATE_CODE=你的模板代码
-```
+预期响应：
 
-3. 修改 `src/services/smsService.ts`：
-```typescript
-import Dysmsapi from '@alicloud/dysmsapi';
-
-const smsClient = new Dysmsapi({
-  accessKeyId: process.env.ALIYUN_ACCESS_KEY_ID,
-  accessKeySecret: process.env.ALIYUN_ACCESS_KEY_SECRET,
-});
-
-async function sendSMS(phoneNumbers: string[], content: string) {
-  const result = await smsClient.sendSms({
-    PhoneNumbers: phoneNumbers.join(','),
-    SignName: process.env.ALIYUN_SMS_SIGN_NAME,
-    TemplateCode: process.env.ALIYUN_SMS_TEMPLATE_CODE,
-    TemplateParam: JSON.stringify({ content }),
-  });
-  return result;
+```json
+{
+  "success": true,
+  "data": [
+    {
+      "id": "uuid",
+      "message": "人找车：...",
+      "keyword": "人找车",
+      "source": "企业微信群机器人",
+      "isNotified": true,
+      "notifiedAt": "2024-01-01T12:00:00.000Z",
+      "createdAt": "2024-01-01T12:00:00.000Z"
+    }
+  ],
+  "pagination": {
+    "total": 1,
+    "page": 1,
+    "pageSize": 20
+  }
 }
 ```
 
 ---
 
-## 🎯 后续扩展
+## 🎯 常见问题
 
-### 添加微信小程序
+### Q1: 企业微信通知发送失败？
 
-如果你想添加小程序前端：
+**原因：**
+- 环境变量未配置或配置错误
+- 企业微信应用权限不足
+- 接收人 UserID 不存在
 
-1. 注册微信小程序账号
-2. 购买域名并备案
-3. 在小程序中调用 Vercel 的 API
-4. 参考 `小程序代码框架` 目录
+**解决方法：**
+1. 检查环境变量是否正确配置
+2. 确认应用已授予"推送消息"权限
+3. 验证接收人 UserID 是否正确
 
-### 添加更多关键字
+### Q2: Webhook 验证失败？
 
-修改 `src/app/api/webhook/route.ts`：
-```typescript
-const KEYWORDS = ['人找车', '车找人', '拼车', '顺风车'];
-```
+**原因：**
+- Token 或 EncodingAESKey 配置错误
+- Webhook URL 无法访问
 
-### 添加更多通知方式
+**解决方法：**
+1. 检查 Token 和 EncodingAESKey 是否与企业微信后台一致
+2. 使用 curl 测试 Webhook URL 是否可访问
 
-- 邮件通知（使用 Nodemailer）
-- 钉钉机器人通知
-- 飞书机器人通知
-- 企业微信应用通知
+### Q3: 通知历史记录为空？
 
----
+**原因：**
+- 数据库连接失败
+- Webhook 未正确接收消息
 
-## 🆘 常见问题
+**解决方法：**
+1. 检查 DATABASE_URL 是否正确配置
+2. 查看 Webhook 接口日志，确认消息是否被接收
 
-### Q1: 部署后无法访问？
-**A**: 检查 Vercel 部署日志，确保构建成功。等待 1-2 分钟让 DNS 生效。
+### Q4: 如何修改监听关键字？
 
-### Q2: Webhook 没有接收到消息？
-**A**: 检查企业微信应用的回调 URL 是否正确，是否启用了"接收消息"功能。
+当前版本仅支持"人找车"关键字，如需扩展：
 
-### Q3: 短信没有发送？
-**A**: 当前为模拟模式，需要接入第三方短信服务才能实际发送。
-
-### Q4: 如何监听多个群？
-**A**: 在每个群中都添加企业微信机器人/应用，配置相同的回调 URL。
-
-### Q5: Vercel 免费额度用完了怎么办？
-**A**:
-- 免费额度：100GB 带宽/月
-- 如果超限，可以考虑：
-  - 使用腾讯云 Serverless（免费额度）
-  - 购买 Vercel Pro 计划（$20/月）
-  - 部署到自己的服务器
+1. 修改 `src/app/api/webhook/route.ts` 中的 `KEYWORDS` 数组
+2. 重新部署项目
 
 ---
 
-## 📞 获取帮助
+## 📚 相关文档
 
-如果遇到问题：
-1. 查看 Vercel 部署日志
-2. 查看企业微信应用配置
-3. 检查浏览器控制台错误
-4. 查看 API 响应
+- [企业微信 API 文档](https://developer.work.weixin.qq.com/document/path/90236)
+- [Next.js 部署文档](https://nextjs.org/docs/deployment)
+- [Vercel 部署文档](https://vercel.com/docs/deployments/overview)
 
 ---
 
-## 🎉 完成！
+## 🔄 更新日志
 
-恭喜你！现在你已经成功部署了微信群监听系统。
+### v2.0.0（企业微信通知版本）
 
-- ✅ 系统运行在 Vercel（免费）
-- ✅ 可以监听微信群消息
-- ✅ 检测"人找车"关键字
-- ✅ 支持短信通知（需配置第三方服务）
-- ✅ 完整的 Web 管理界面
+- ✅ 从短信通知变更为企业微信应用通知
+- ✅ 新增企业微信通知服务
+- ✅ 新增企业微信接收人配置 API
+- ✅ 新增企业微信测试通知 API
+- ✅ 支持模拟模式（未配置环境变量时）
+- ✅ 更新前端配置界面
 
-享受你的自动化监听系统吧！🚀
+### v1.0.0（初始版本）
+
+- ✅ 企业微信群机器人 Webhook 接收
+- ✅ 关键字检测功能
+- ✅ 短信通知功能（已废弃）
+- ✅ 通知历史记录与统计

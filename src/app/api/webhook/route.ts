@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { notificationManager } from '@/storage/database/notificationManager';
-import { smsService } from '@/services/smsService';
+import { weWorkNotificationService } from '@/services/weWorkNotificationService';
 
 // 关键字配置
 const KEYWORDS = ['人找车'];
@@ -19,29 +19,43 @@ function containsKeywords(content: string): string | null {
   return KEYWORDS.find(keyword => content.includes(keyword)) || null;
 }
 
-// 发送通知（记录到数据库 + 发送短信）
-async function sendNotification(message: string, keyword: string): Promise<void> {
+// 发送通知（记录到数据库 + 发送企业微信通知）
+async function sendNotification(message: string, keyword: string, source: string): Promise<void> {
   console.log('🔔 [通知检测到关键字消息]', { keyword, message });
   
-  // 1. 记录到数据库
-  await notificationManager.createNotification({
+  // 1. 记录到数据库（初始状态：未通知）
+  const notification = await notificationManager.createNotification({
     message,
     keyword,
-    source: '企业微信群机器人',
-    isNotified: true,
+    source: source || '企业微信群机器人',
+    isNotified: false,
   });
 
-  // 2. 发送短信通知（如果配置了手机号）
+  // 2. 发送企业微信通知
   try {
-    const smsResult = await smsService.sendKeywordAlert(keyword, message);
-    if (smsResult.success) {
-      console.log('✅ 短信通知发送成功');
+    const { configManager } = await import('@/storage/database/configManager');
+    const userIds = await configManager.getWeWorkUserIds();
+
+    if (userIds.length === 0) {
+      console.warn('⚠️ 未配置企业微信接收人，无法发送通知');
     } else {
-      console.warn('⚠️ 短信通知发送失败:', smsResult.message);
+      const result = await weWorkNotificationService.sendKeywordAlert(
+        userIds,
+        keyword,
+        message,
+        source || '企业微信群机器人'
+      );
+      if (result.success) {
+        console.log('✅ 企业微信通知发送成功');
+        // 标记为已通知
+        await notificationManager.markAsNotified(notification.id);
+      } else {
+        console.warn('⚠️ 企业微信通知发送失败:', result.message);
+      }
     }
   } catch (error) {
-    console.error('❌ 发送短信通知时出错:', error);
-    // 短信发送失败不影响主流程
+    console.error('❌ 发送企业微信通知时出错:', error);
+    // 通知发送失败不影响主流程
   }
 }
 
@@ -58,7 +72,7 @@ export async function POST(request: NextRequest) {
       
       if (keyword) {
         // 发送通知并记录到数据库
-        await sendNotification(content, keyword);
+        await sendNotification(content, keyword, '企业微信群机器人');
         
         return NextResponse.json({
           success: true,

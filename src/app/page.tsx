@@ -28,11 +28,11 @@ export default function Home() {
   const [stats, setStats] = useState<Statistics>({ total: 0, notified: 0, unNotified: 0 });
   const [loading, setLoading] = useState(true);
   
-  // 短信配置
-  const [phoneNumbers, setPhoneNumbers] = useState<string[]>([]);
-  const [newPhoneNumber, setNewPhoneNumber] = useState('');
-  const [testPhoneNumbers, setTestPhoneNumbers] = useState('');
-  const [testContent, setTestContent] = useState('【测试】这是一条测试短信');
+  // 企业微信接收人配置
+  const [userIds, setUserIds] = useState<string[]>([]);
+  const [newUserId, setNewUserId] = useState('');
+  const [testUserIds, setTestUserIds] = useState('');
+  const [testContent, setTestContent] = useState('这是一条测试通知');
   
   // 测试消息
   const [testMessage, setTestMessage] = useState('人找车：今天下午从北京到上海，有人顺路吗？');
@@ -68,103 +68,97 @@ export default function Home() {
     }
   };
 
-  // 加载手机号配置
-  const loadPhoneNumbers = async () => {
+  // 加载企业微信接收人配置
+  const loadUserIds = async () => {
     try {
-      const response = await fetch('/api/configs/sms-phone-numbers');
+      const response = await fetch('/api/configs/wework-user-ids');
       const data = await response.json();
       
       if (data.success) {
-        setPhoneNumbers(data.data || []);
+        setUserIds(data.data || []);
       }
     } catch (error) {
-      console.error('加载手机号失败:', error);
+      console.error('加载接收人失败:', error);
     }
   };
 
-  // 添加手机号
-  const addPhoneNumber = async () => {
-    if (!newPhoneNumber) return;
+  // 添加接收人
+  const addUserId = async () => {
+    if (!newUserId) return;
 
-    const phoneRegex = /^1[3-9]\d{9}$/;
-    if (!phoneRegex.test(newPhoneNumber)) {
-      alert('手机号格式不正确，请输入11位手机号');
-      return;
-    }
-
-    const newNumbers = [...phoneNumbers, newPhoneNumber];
+    const newUserIds = [...userIds, newUserId];
     
     try {
-      const response = await fetch('/api/configs/sms-phone-numbers', {
+      const response = await fetch('/api/configs/wework-user-ids', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          phoneNumbers: newNumbers,
+          userIds: newUserIds,
         }),
       });
       
       const data = await response.json();
       
       if (data.success) {
-        setPhoneNumbers(newNumbers);
-        setNewPhoneNumber('');
-        alert('手机号添加成功！');
+        setUserIds(newUserIds);
+        setNewUserId('');
+        alert('接收人添加成功！');
       } else {
         alert('添加失败：' + data.error);
       }
     } catch (error) {
-      console.error('添加手机号失败:', error);
+      console.error('添加接收人失败:', error);
       alert('添加失败，请查看控制台');
     }
   };
 
-  // 删除手机号
-  const removePhoneNumber = async (phone: string) => {
-    const newNumbers = phoneNumbers.filter(p => p !== phone);
+  // 删除接收人
+  const removeUserId = async (userId: string) => {
+    const newUserIds = userIds.filter(u => u !== userId);
     
     try {
-      const response = await fetch('/api/configs/sms-phone-numbers', {
+      const response = await fetch('/api/configs/wework-user-ids', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          phoneNumbers: newNumbers,
+          userIds: newUserIds,
         }),
       });
       
       const data = await response.json();
       
       if (data.success) {
-        setPhoneNumbers(newNumbers);
+        setUserIds(newUserIds);
       } else {
         alert('删除失败：' + data.error);
       }
     } catch (error) {
-      console.error('删除手机号失败:', error);
+      console.error('删除接收人失败:', error);
       alert('删除失败，请查看控制台');
     }
   };
 
-  // 发送测试短信
-  const sendTestSMS = async () => {
-    const phoneArray = testPhoneNumbers.split(',').map(p => p.trim()).filter(p => p);
+  // 发送测试通知
+  const sendTestNotification = async () => {
+    const userIdArray = testUserIds.split(',').map(u => u.trim()).filter(u => u);
     
-    if (phoneArray.length === 0) {
-      alert('请输入测试手机号（多个手机号用逗号分隔）');
+    if (userIdArray.length === 0) {
+      alert('请输入测试接收人（多个用逗号分隔）');
       return;
     }
 
     try {
-      const response = await fetch('/api/sms/test', {
+      const response = await fetch('/api/wework/test', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          phoneNumbers: phoneArray,
+          userIds: userIdArray,
           content: testContent,
         }),
       });
@@ -172,17 +166,17 @@ export default function Home() {
       const data = await response.json();
       
       if (data.success) {
-        alert(`测试短信发送成功！\n${data.message}`);
+        alert(`测试通知发送成功！\n${data.message}`);
       } else {
         alert('发送失败：' + data.error);
       }
     } catch (error) {
-      console.error('发送测试短信失败:', error);
+      console.error('发送测试通知失败:', error);
       alert('发送失败，请查看控制台');
     }
   };
 
-  // 发送测试消息（触发关键字检测 + 短信通知）
+  // 发送测试消息（触发关键字检测 + 企业微信通知）
   const sendTestMessage = async () => {
     try {
       const response = await fetch('/api/notifications', {
@@ -200,7 +194,7 @@ export default function Home() {
       const data = await response.json();
       
       if (data.success) {
-        alert('测试消息发送成功！\n如果已配置手机号，会同时发送短信通知。');
+        alert('测试消息发送成功！\n如果已配置接收人，会同时发送企业微信通知。');
         loadNotifications();
         loadStats();
       } else {
@@ -216,7 +210,7 @@ export default function Home() {
   useEffect(() => {
     loadNotifications();
     loadStats();
-    loadPhoneNumbers();
+    loadUserIds();
     
     // 每 10 秒自动刷新数据
     const interval = setInterval(() => {
@@ -246,10 +240,10 @@ export default function Home() {
         {/* 页头 */}
         <div className="text-center space-y-2">
           <h1 className="text-3xl md:text-4xl font-bold text-slate-900 dark:text-slate-50">
-            微信群消息监听系统
+            微信群监听系统
           </h1>
           <p className="text-slate-600 dark:text-slate-400">
-            实时监听微信群消息，检测关键字并自动发送短信通知
+            实时监听微信群消息，检测关键字并发送企业微信通知
           </p>
         </div>
 
@@ -295,49 +289,53 @@ export default function Home() {
           </Card>
         </div>
 
-        {/* 短信配置 */}
+        {/* 企业微信通知配置 */}
         <Card>
           <CardHeader>
-            <CardTitle>📱 短信通知配置</CardTitle>
+            <CardTitle>💼 企业微信通知配置</CardTitle>
             <CardDescription>
-              配置接收短信通知的手机号
+              配置接收企业微信通知的用户（UserID）
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
             <Alert>
               <AlertDescription className="text-sm">
-                <strong>⚠️ 重要说明：</strong>当前短信服务为模拟模式，短信不会实际发送。
-                如需发送真实短信，需要在后端接入第三方短信服务（如阿里云短信、腾讯云短信等）。
+                <strong>⚠️ 重要说明：</strong>
+                <br />
+                1. 配置环境变量：<code>WEWORK_CORP_ID</code>、<code>WEWORK_AGENT_ID</code>、<code>WEWORK_AGENT_SECRET</code>
+                <br />
+                2. 在企业微信管理后台查看成员的 UserID
+                <br />
+                3. 未配置环境变量时，通知为模拟模式（控制台日志）
               </AlertDescription>
             </Alert>
 
             <div className="space-y-3">
               <div className="flex gap-2">
                 <Input
-                  value={newPhoneNumber}
-                  onChange={(e) => setNewPhoneNumber(e.target.value)}
-                  placeholder="输入11位手机号"
+                  value={newUserId}
+                  onChange={(e) => setNewUserId(e.target.value)}
+                  placeholder="输入企业微信成员 UserID"
                   className="flex-1"
-                  maxLength={11}
                 />
-                <Button onClick={addPhoneNumber} disabled={loading}>
+                <Button onClick={addUserId} disabled={loading}>
                   添加
                 </Button>
               </div>
 
-              {phoneNumbers.length > 0 && (
+              {userIds.length > 0 && (
                 <div className="space-y-2">
                   <p className="text-sm font-medium text-slate-900 dark:text-slate-50">
-                    已配置的手机号：
+                    已配置的接收人：
                   </p>
                   <div className="flex flex-wrap gap-2">
-                    {phoneNumbers.map((phone, index) => (
+                    {userIds.map((userId, index) => (
                       <div key={index} className="flex items-center gap-2">
-                        <Badge variant="secondary">{phone}</Badge>
+                        <Badge variant="secondary">{userId}</Badge>
                         <Button
                           variant="ghost"
                           size="sm"
-                          onClick={() => removePhoneNumber(phone)}
+                          onClick={() => removeUserId(userId)}
                           className="h-6 px-2 text-red-600 hover:text-red-700 hover:bg-red-50"
                         >
                           ✕
@@ -348,32 +346,32 @@ export default function Home() {
                 </div>
               )}
 
-              {phoneNumbers.length === 0 && (
+              {userIds.length === 0 && (
                 <p className="text-sm text-slate-500 dark:text-slate-400">
-                  暂未配置手机号，添加后将自动发送短信通知
+                  暂未配置接收人，添加后将自动发送企业微信通知
                 </p>
               )}
             </div>
           </CardContent>
         </Card>
 
-        {/* 短信测试 */}
+        {/* 企业微信通知测试 */}
         <Card>
           <CardHeader>
-            <CardTitle>🧪 短信测试</CardTitle>
+            <CardTitle>🧪 企业微信通知测试</CardTitle>
             <CardDescription>
-              测试短信发送功能（模拟模式）
+              测试企业微信通知功能
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
             <div className="space-y-2">
               <label className="text-sm font-medium text-slate-900 dark:text-slate-50">
-                测试手机号（多个用逗号分隔）
+                测试接收人（多个用逗号分隔）
               </label>
               <Input
-                value={testPhoneNumbers}
-                onChange={(e) => setTestPhoneNumbers(e.target.value)}
-                placeholder="例如: 13800138000, 13900139000"
+                value={testUserIds}
+                onChange={(e) => setTestUserIds(e.target.value)}
+                placeholder="例如: user1, user2, user3"
               />
             </div>
 
@@ -385,12 +383,12 @@ export default function Home() {
                 value={testContent}
                 onChange={(e) => setTestContent(e.target.value)}
                 className="w-full min-h-[80px] px-3 py-2 text-sm border border-slate-300 dark:border-slate-700 rounded-md bg-transparent"
-                placeholder="输入测试短信内容"
+                placeholder="输入测试通知内容"
               />
             </div>
 
-            <Button onClick={sendTestSMS} disabled={loading} className="w-full">
-              发送测试短信
+            <Button onClick={sendTestNotification} disabled={loading} className="w-full">
+              发送测试通知
             </Button>
           </CardContent>
         </Card>
@@ -400,7 +398,7 @@ export default function Home() {
           <CardHeader>
             <CardTitle>📡 Webhook 配置</CardTitle>
             <CardDescription>
-              配置企业微信群机器人的 Webhook URL
+              配置企业微信应用的 Webhook URL
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
@@ -416,10 +414,11 @@ export default function Home() {
             <div className="space-y-2 text-sm text-slate-600 dark:text-slate-400">
               <p>📝 <strong>配置步骤：</strong></p>
               <ol className="list-decimal list-inside space-y-1 ml-4">
-                <li>在企业微信群中添加群机器人</li>
-                <li>获取机器人的 Webhook 地址</li>
-                <li>配置企业微信机器人向本服务发送消息</li>
-                <li>消息中包含"人找车"关键字时会自动触发通知和短信</li>
+                <li>在企业微信管理后台创建应用</li>
+                <li>配置应用的"接收消息"回调 URL</li>
+                <li>将应用添加到要监听的微信群</li>
+                <li>配置环境变量：WEWORK_CORP_ID、WEWORK_AGENT_ID、WEWORK_AGENT_SECRET</li>
+                <li>消息中包含"人找车"关键字时会自动触发通知</li>
               </ol>
             </div>
 
@@ -441,7 +440,7 @@ export default function Home() {
           <CardHeader>
             <CardTitle>🔍 关键字检测测试</CardTitle>
             <CardDescription>
-              发送测试消息验证监听功能（会同时触发短信通知）
+              发送测试消息验证监听功能（会同时触发企业微信通知）
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
@@ -458,7 +457,7 @@ export default function Home() {
             </div>
             <p className="text-xs text-slate-500 dark:text-slate-400">
               点击发送测试按钮，模拟收到包含关键字的微信群消息。
-              如果已配置手机号，会同时发送短信通知。
+              如果已配置接收人，会同时发送企业微信通知。
             </p>
           </CardContent>
         </Card>

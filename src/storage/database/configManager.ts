@@ -76,6 +76,28 @@ export class ConfigManager {
   /**
    * 获取常用配置的便捷方法
    */
+
+  // ========== 企业微信接收人配置 ==========
+  async getWeWorkUserIds(): Promise<string[]> {
+    const config = await this.getConfig('wework_user_ids');
+    if (!config || !config.value) return [];
+    
+    try {
+      return JSON.parse(config.value);
+    } catch {
+      return [];
+    }
+  }
+
+  async setWeWorkUserIds(userIds: string[]): Promise<void> {
+    await this.setConfig(
+      'wework_user_ids',
+      JSON.stringify(userIds),
+      '接收企业微信通知的用户 UserID 列表（JSON 数组）'
+    );
+  }
+
+  // ========== 短信手机号配置（保留用于兼容性）==========
   async getSmsPhoneNumbers(): Promise<string[]> {
     const config = await this.getConfig('sms_phone_numbers');
     if (!config || !config.value) return [];
