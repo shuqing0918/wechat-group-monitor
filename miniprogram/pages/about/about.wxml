@@ -1,0 +1,105 @@
+<!--pages/about/about.wxml-->
+<view class="container">
+  <!-- 应用信息 -->
+  <view class="app-info">
+    <view class="app-icon">🤖</view>
+    <view class="app-name">微信群监听系统</view>
+    <view class="app-version">v1.0.0</view>
+  </view>
+
+  <!-- 功能说明 -->
+  <view class="feature-card">
+    <view class="card-title">✨ 主要功能</view>
+    <view class="feature-list">
+      <view class="feature-item">
+        <text class="feature-icon">📊</text>
+        <text class="feature-text">实时监控微信群消息</text>
+      </view>
+      <view class="feature-item">
+        <text class="feature-icon">🔍</text>
+        <text class="feature-text">自动检测"人找车"关键字</text>
+      </view>
+      <view class="feature-item">
+        <text class="feature-icon">📱</text>
+        <text class="feature-text">短信通知功能（需配置）</text>
+      </view>
+      <view class="feature-item">
+        <text class="feature-icon">📋</text>
+        <text class="feature-text">通知记录和统计</text>
+      </view>
+    </view>
+  </view>
+
+  <!-- 使用说明 -->
+  <view class="guide-card">
+    <view class="card-title">📖 使用说明</view>
+    <view class="guide-list">
+      <view class="guide-item">
+        <text class="guide-number">1</text>
+        <text class="guide-text">在目标微信群中添加企业微信机器人</text>
+      </view>
+      <view class="guide-item">
+        <text class="guide-number">2</text>
+        <text class="guide-text">配置机器人 Webhook 推送到后端</text>
+      </view>
+      <view class="guide-item">
+        <text class="guide-number">3</text>
+        <text class="guide-text">在本小程序中配置接收短信的手机号</text>
+      </view>
+      <view class="guide-item">
+        <text class="guide-number">4</text>
+        <text class="guide-text">当群消息包含"人找车"时自动通知</text>
+      </view>
+    </view>
+  </view>
+
+  <!-- 技术说明 -->
+  <view class="tech-card">
+    <view class="card-title">⚙️ 技术架构</view>
+    <view class="tech-content">
+      <text class="tech-text">前端：微信小程序</text>
+      <text class="tech-text">后端：Next.js + Vercel</text>
+      <text class="tech-text">数据库：PostgreSQL</text>
+      <text class="tech-text">消息接收：企业微信应用</text>
+    </view>
+  </view>
+
+  <!-- 重要提示 -->
+  <view class="warning-card">
+    <view class="card-title">⚠️ 重要提示</view>
+    <view class="warning-content">
+      <text>• 当前短信服务为模拟模式，不会实际发送</text>
+      <text>• 需接入第三方短信服务才能实际发送通知</text>
+      <text>• 系统需要配置企业微信应用才能接收群消息</text>
+      <text>• 需要配置小程序服务器域名白名单</text>
+    </view>
+  </view>
+
+  <!-- 联系信息 -->
+  <view class="contact-card">
+    <view class="card-title">📞 技术支持</view>
+    <view class="contact-content">
+      <text class="contact-item">如有问题请联系技术支持</text>
+      <text class="contact-item">或查看部署文档</text>
+    </view>
+  </view>
+
+  <!-- 版权信息 -->
+  <view class="footer">
+    <text class="footer-text">© 2024 微信群监听系统</text>
+    <text class="footer-text">All Rights Reserved</text>
+  </view>
+
+  <!-- 底部导航 -->
+  <view class="tab-bar">
+    <view class="tab-item" bindtap="switchTab" data-tab="index">
+      <text>通知</text>
+    </view>
+    <view class="tab-item" bindtap="switchTab" data-tab="config">
+      <text>配置</text>
+    </view>
+    <view class="tab-item active" bindtap="switchTab" data-tab="about">
+      <text>关于</text>
+    </view>
+  </view>
+</view>

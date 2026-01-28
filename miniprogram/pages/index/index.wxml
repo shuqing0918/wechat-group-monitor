@@ -1,0 +1,68 @@
+<!--pages/index/index.wxml-->
+<view class="container">
+  <!-- 统计卡片 -->
+  <view class="stats-container">
+    <view class="stat-card">
+      <view class="stat-value">{{stats.total}}</view>
+      <view class="stat-label">总通知数</view>
+    </view>
+    <view class="stat-card">
+      <view class="stat-value stat-green">{{stats.notified}}</view>
+      <view class="stat-label">已通知</view>
+    </view>
+    <view class="stat-card">
+      <view class="stat-value stat-orange">{{stats.unNotified}}</view>
+      <view class="stat-label">待处理</view>
+    </view>
+  </view>
+
+  <!-- 刷新按钮 -->
+  <view class="refresh-btn">
+    <button type="primary" bindtap="refreshData" loading="{{loading}}">
+      {{loading ? '刷新中...' : '刷新数据'}}
+    </button>
+  </view>
+
+  <!-- 通知列表 -->
+  <view class="list-container">
+    <view class="list-header">
+      <text class="list-title">通知记录</text>
+      <text class="list-count">共 {{notifications.length}} 条</text>
+    </view>
+
+    <view wx:if="{{notifications.length === 0}}" class="empty-state">
+      <text>暂无通知记录</text>
+    </view>
+
+    <view wx:else class="notification-list">
+      <view wx:for="{{notifications}}" wx:key="id" class="notification-item">
+        <view class="notification-header">
+          <view class="notification-badge">{{item.keyword}}</view>
+          <view class="notification-status {{item.isNotified ? 'status-notified' : 'status-pending'}}">
+            {{item.isNotified ? '已通知' : '待处理'}}
+          </view>
+        </view>
+        
+        <view class="notification-content">{{item.message}}</view>
+        
+        <view class="notification-footer">
+          <text class="notification-source">{{item.source}}</text>
+          <text class="notification-time">{{item.createdAt}}</text>
+        </view>
+      </view>
+    </view>
+  </view>
+
+  <!-- 底部导航 -->
+  <view class="tab-bar">
+    <view class="tab-item active" bindtap="switchTab" data-tab="index">
+      <text>通知</text>
+    </view>
+    <view class="tab-item" bindtap="switchTab" data-tab="config">
+      <text>配置</text>
+    </view>
+    <view class="tab-item" bindtap="switchTab" data-tab="about">
+      <text>关于</text>
+    </view>
+  </view>
+</view>

@@ -1,0 +1,174 @@
+/* pages/index/index.wxss */
+.container {
+  padding: 20rpx;
+  padding-bottom: 120rpx;
+}
+
+/* 统计卡片 */
+.stats-container {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 30rpx;
+}
+
+.stat-card {
+  flex: 1;
+  margin: 0 10rpx;
+  padding: 30rpx 20rpx;
+  background: #fff;
+  border-radius: 16rpx;
+  box-shadow: 0 2rpx 12rpx rgba(0, 0, 0, 0.08);
+  text-align: center;
+}
+
+.stat-value {
+  font-size: 48rpx;
+  font-weight: bold;
+  color: #333;
+  margin-bottom: 10rpx;
+}
+
+.stat-green {
+  color: #52c41a;
+}
+
+.stat-orange {
+  color: #fa8c16;
+}
+
+.stat-label {
+  font-size: 24rpx;
+  color: #999;
+}
+
+/* 刷新按钮 */
+.refresh-btn {
+  margin-bottom: 30rpx;
+}
+
+.refresh-btn button {
+  width: 100%;
+}
+
+/* 列表容器 */
+.list-container {
+  background: #fff;
+  border-radius: 16rpx;
+  overflow: hidden;
+  box-shadow: 0 2rpx 12rpx rgba(0, 0, 0, 0.08);
+}
+
+.list-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 30rpx;
+  border-bottom: 1rpx solid #f0f0f0;
+}
+
+.list-title {
+  font-size: 32rpx;
+  font-weight: bold;
+  color: #333;
+}
+
+.list-count {
+  font-size: 24rpx;
+  color: #999;
+}
+
+/* 空状态 */
+.empty-state {
+  padding: 100rpx 0;
+  text-align: center;
+  color: #999;
+  font-size: 28rpx;
+}
+
+/* 通知列表 */
+.notification-list {
+  padding: 20rpx;
+}
+
+.notification-item {
+  padding: 24rpx;
+  margin-bottom: 20rpx;
+  background: #f9f9f9;
+  border-radius: 12rpx;
+  border: 1rpx solid #e8e8e8;
+}
+
+.notification-item:last-child {
+  margin-bottom: 0;
+}
+
+.notification-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16rpx;
+}
+
+.notification-badge {
+  padding: 6rpx 16rpx;
+  background: #1890ff;
+  color: #fff;
+  font-size: 22rpx;
+  border-radius: 8rpx;
+}
+
+.notification-status {
+  padding: 6rpx 16rpx;
+  font-size: 22rpx;
+  border-radius: 8rpx;
+}
+
+.status-notified {
+  background: #52c41a;
+  color: #fff;
+}
+
+.status-pending {
+  background: #fa8c16;
+  color: #fff;
+}
+
+.notification-content {
+  font-size: 28rpx;
+  color: #333;
+  line-height: 1.6;
+  margin-bottom: 16rpx;
+}
+
+.notification-footer {
+  display: flex;
+  justify-content: space-between;
+  font-size: 24rpx;
+  color: #999;
+}
+
+/* 底部导航 */
+.tab-bar {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  display: flex;
+  background: #fff;
+  border-top: 1rpx solid #e8e8e8;
+  padding: 20rpx 0;
+  padding-bottom: calc(20rpx + env(safe-area-inset-bottom));
+}
+
+.tab-item {
+  flex: 1;
+  text-align: center;
+  padding: 10rpx 0;
+  font-size: 28rpx;
+  color: #999;
+}
+
+.tab-item.active {
+  color: #1890ff;
+  font-weight: bold;
+}

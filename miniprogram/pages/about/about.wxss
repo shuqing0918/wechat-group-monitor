@@ -1,0 +1,193 @@
+/* pages/about/about.wxss */
+.container {
+  padding: 20rpx;
+  padding-bottom: 120rpx;
+}
+
+/* 应用信息 */
+.app-info {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 60rpx 0;
+  background: #fff;
+  border-radius: 16rpx;
+  margin-bottom: 30rpx;
+  box-shadow: 0 2rpx 12rpx rgba(0, 0, 0, 0.08);
+}
+
+.app-icon {
+  font-size: 120rpx;
+  margin-bottom: 20rpx;
+}
+
+.app-name {
+  font-size: 36rpx;
+  font-weight: bold;
+  color: #333;
+  margin-bottom: 12rpx;
+}
+
+.app-version {
+  font-size: 24rpx;
+  color: #999;
+}
+
+/* 卡片通用样式 */
+.feature-card,
+.guide-card,
+.tech-card,
+.warning-card,
+.contact-card {
+  background: #fff;
+  border-radius: 16rpx;
+  padding: 30rpx;
+  margin-bottom: 30rpx;
+  box-shadow: 0 2rpx 12rpx rgba(0, 0, 0, 0.08);
+}
+
+.card-title {
+  font-size: 32rpx;
+  font-weight: bold;
+  color: #333;
+  margin-bottom: 24rpx;
+}
+
+/* 功能列表 */
+.feature-list {
+  display: flex;
+  flex-direction: column;
+  gap: 20rpx;
+}
+
+.feature-item {
+  display: flex;
+  align-items: center;
+  padding: 20rpx;
+  background: #f9f9f9;
+  border-radius: 12rpx;
+}
+
+.feature-icon {
+  font-size: 40rpx;
+  margin-right: 20rpx;
+}
+
+.feature-text {
+  font-size: 28rpx;
+  color: #333;
+  flex: 1;
+}
+
+/* 使用说明 */
+.guide-list {
+  display: flex;
+  flex-direction: column;
+  gap: 20rpx;
+}
+
+.guide-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 20rpx;
+}
+
+.guide-number {
+  width: 60rpx;
+  height: 60rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #1890ff;
+  color: #fff;
+  border-radius: 50%;
+  font-size: 28rpx;
+  font-weight: bold;
+  flex-shrink: 0;
+}
+
+.guide-text {
+  font-size: 28rpx;
+  color: #333;
+  line-height: 1.6;
+  flex: 1;
+  padding-top: 10rpx;
+}
+
+/* 技术说明 */
+.tech-content {
+  display: flex;
+  flex-direction: column;
+  gap: 16rpx;
+}
+
+.tech-text {
+  font-size: 28rpx;
+  color: #666;
+  line-height: 1.8;
+}
+
+/* 重要提示 */
+.warning-content {
+  display: flex;
+  flex-direction: column;
+  gap: 12rpx;
+}
+
+.warning-content text {
+  font-size: 26rpx;
+  color: #8c6c46;
+  line-height: 1.8;
+}
+
+/* 联系信息 */
+.contact-content {
+  display: flex;
+  flex-direction: column;
+  gap: 12rpx;
+}
+
+.contact-item {
+  font-size: 28rpx;
+  color: #666;
+  line-height: 1.8;
+}
+
+/* 版权信息 */
+.footer {
+  text-align: center;
+  padding: 40rpx 0;
+}
+
+.footer-text {
+  display: block;
+  font-size: 24rpx;
+  color: #999;
+  margin-bottom: 8rpx;
+}
+
+/* 底部导航 */
+.tab-bar {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  display: flex;
+  background: #fff;
+  border-top: 1rpx solid #e8e8e8;
+  padding: 20rpx 0;
+  padding-bottom: calc(20rpx + env(safe-area-inset-bottom));
+}
+
+.tab-item {
+  flex: 1;
+  text-align: center;
+  padding: 10rpx 0;
+  font-size: 28rpx;
+  color: #999;
+}
+
+.tab-item.active {
+  color: #1890ff;
+  font-weight: bold;
+}

@@ -1,0 +1,77 @@
+<!--pages/config/config.wxml-->
+<view class="container">
+  <!-- 说明卡片 -->
+  <view class="info-card">
+    <view class="info-title">📱 短信通知配置</view>
+    <view class="info-desc">
+      配置接收短信通知的手机号，当检测到"人找车"关键字时，会自动发送短信通知。
+    </view>
+  </view>
+
+  <!-- 手机号列表 -->
+  <view class="phone-list">
+    <view class="list-header">
+      <text class="list-title">已配置的手机号</text>
+      <text class="list-count">共 {{phoneNumbers.length}} 个</text>
+    </view>
+
+    <view wx:if="{{phoneNumbers.length === 0}}" class="empty-state">
+      <text>暂未配置手机号</text>
+    </view>
+
+    <view wx:else class="phone-items">
+      <view wx:for="{{phoneNumbers}}" wx:key="*this" class="phone-item">
+        <view class="phone-number">{{item}}</view>
+        <view class="phone-delete" bindtap="deletePhoneNumber" data-phone="{{item}}">
+          ✕
+        </view>
+      </view>
+    </view>
+  </view>
+
+  <!-- 添加手机号 -->
+  <view class="add-section">
+    <view class="input-group">
+      <input 
+        class="phone-input" 
+        type="number" 
+        placeholder="输入11位手机号" 
+        maxlength="11"
+        bindinput="onPhoneInput"
+        value="{{phoneNumber}}"
+      />
+    </view>
+    <button 
+      type="primary" 
+      class="add-btn"
+      bindtap="addPhoneNumber"
+      disabled="{{!phoneNumber || adding}}"
+    >
+      {{adding ? '添加中...' : '添加手机号'}}
+    </button>
+  </view>
+
+  <!-- 提示信息 -->
+  <view class="tips-card">
+    <view class="tips-title">💡 使用提示</view>
+    <view class="tips-content">
+      <text>1. 手机号必须是11位中国大陆手机号</text>
+      <text>2. 可以配置多个手机号</text>
+      <text>3. 当前短信为模拟模式，不会实际发送</text>
+      <text>4. 需接入第三方短信服务才能实际发送</text>
+    </view>
+  </view>
+
+  <!-- 底部导航 -->
+  <view class="tab-bar">
+    <view class="tab-item" bindtap="switchTab" data-tab="index">
+      <text>通知</text>
+    </view>
+    <view class="tab-item active" bindtap="switchTab" data-tab="config">
+      <text>配置</text>
+    </view>
+    <view class="tab-item" bindtap="switchTab" data-tab="about">
+      <text>关于</text>
+    </view>
+  </view>
+</view>

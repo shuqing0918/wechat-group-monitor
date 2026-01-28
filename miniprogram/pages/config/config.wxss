@@ -1,0 +1,179 @@
+/* pages/config/config.wxss */
+.container {
+  padding: 20rpx;
+  padding-bottom: 120rpx;
+}
+
+/* 说明卡片 */
+.info-card {
+  padding: 30rpx;
+  background: #fff;
+  border-radius: 16rpx;
+  margin-bottom: 30rpx;
+  box-shadow: 0 2rpx 12rpx rgba(0, 0, 0, 0.08);
+}
+
+.info-title {
+  font-size: 32rpx;
+  font-weight: bold;
+  color: #333;
+  margin-bottom: 16rpx;
+}
+
+.info-desc {
+  font-size: 28rpx;
+  color: #666;
+  line-height: 1.6;
+}
+
+/* 手机号列表 */
+.phone-list {
+  background: #fff;
+  border-radius: 16rpx;
+  margin-bottom: 30rpx;
+  overflow: hidden;
+  box-shadow: 0 2rpx 12rpx rgba(0, 0, 0, 0.08);
+}
+
+.list-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 30rpx;
+  border-bottom: 1rpx solid #f0f0f0;
+}
+
+.list-title {
+  font-size: 32rpx;
+  font-weight: bold;
+  color: #333;
+}
+
+.list-count {
+  font-size: 24rpx;
+  color: #999;
+}
+
+.empty-state {
+  padding: 80rpx 0;
+  text-align: center;
+  color: #999;
+  font-size: 28rpx;
+}
+
+.phone-items {
+  padding: 20rpx;
+}
+
+.phone-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 24rpx;
+  margin-bottom: 20rpx;
+  background: #f9f9f9;
+  border-radius: 12rpx;
+  border: 1rpx solid #e8e8e8;
+}
+
+.phone-item:last-child {
+  margin-bottom: 0;
+}
+
+.phone-number {
+  font-size: 32rpx;
+  color: #333;
+  font-weight: bold;
+}
+
+.phone-delete {
+  width: 60rpx;
+  height: 60rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #ff4d4f;
+  color: #fff;
+  border-radius: 50%;
+  font-size: 28rpx;
+}
+
+/* 添加区域 */
+.add-section {
+  padding: 30rpx;
+  background: #fff;
+  border-radius: 16rpx;
+  margin-bottom: 30rpx;
+  box-shadow: 0 2rpx 12rpx rgba(0, 0, 0, 0.08);
+}
+
+.input-group {
+  margin-bottom: 20rpx;
+}
+
+.phone-input {
+  width: 100%;
+  height: 88rpx;
+  padding: 0 24rpx;
+  background: #f9f9f9;
+  border: 1rpx solid #e8e8e8;
+  border-radius: 12rpx;
+  font-size: 28rpx;
+}
+
+.add-btn {
+  width: 100%;
+}
+
+/* 提示卡片 */
+.tips-card {
+  padding: 30rpx;
+  background: #fff7e6;
+  border-radius: 16rpx;
+  border: 1rpx solid #ffd591;
+}
+
+.tips-title {
+  font-size: 28rpx;
+  font-weight: bold;
+  color: #fa8c16;
+  margin-bottom: 20rpx;
+}
+
+.tips-content {
+  display: flex;
+  flex-direction: column;
+  gap: 12rpx;
+}
+
+.tips-content text {
+  font-size: 26rpx;
+  color: #8c6c46;
+  line-height: 1.6;
+}
+
+/* 底部导航 */
+.tab-bar {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  display: flex;
+  background: #fff;
+  border-top: 1rpx solid #e8e8e8;
+  padding: 20rpx 0;
+  padding-bottom: calc(20rpx + env(safe-area-inset-bottom));
+}
+
+.tab-item {
+  flex: 1;
+  text-align: center;
+  padding: 10rpx 0;
+  font-size: 28rpx;
+  color: #999;
+}
+
+.tab-item.active {
+  color: #1890ff;
+  font-weight: bold;
+}
