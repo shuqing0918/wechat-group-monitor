@@ -62,7 +62,7 @@ export async function GET(request: NextRequest) {
 
   console.log('📥 [调试] 收到请求:', { msg_signature, timestamp, nonce, echostr });
 
-  const debugInfo = {
+  const debugInfo: any = {
     timestamp,
     params: {
       msg_signature: msg_signature || '未提供',
