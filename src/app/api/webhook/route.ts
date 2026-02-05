@@ -98,8 +98,81 @@ export async function POST(request: NextRequest) {
   }
 }
 
-// GET 方法用于验证 Webhook 配置
-export async function GET() {
+// 企业微信 URL 验证
+function verifyWeWorkURL(msg_signature: string, timestamp: string, nonce: string, echostr: string): string | null {
+  const token = process.env.WEWORK_TOKEN;
+
+  console.log('🔍 [验证] 环境变量检查:');
+  console.log('  WEWORK_TOKEN 是否存在:', !!token);
+  console.log('  WEWORK_TOKEN 值:', token || '未配置');
+
+  if (!token) {
+    console.error('⚠️ 未配置 WEWORK_TOKEN 环境变量，无法验证企业微信 URL');
+    return null;
+  }
+
+  // 按照企业微信文档的规则排序并生成签名
+  const crypto = require('crypto');
+  const arr = [token, timestamp, nonce].sort();
+  const sortedString = arr.join('');
+
+  console.log('🔍 [验证] 签名计算过程:');
+  console.log('  原始数组:', [token, timestamp, nonce]);
+  console.log('  排序后数组:', arr);
+  console.log('  拼接字符串:', sortedString);
+
+  const sha1 = crypto.createHash('sha1');
+  sha1.update(sortedString);
+  const signature = sha1.digest('hex');
+
+  console.log('🔍 [验证] 签名结果:');
+  console.log('  计算出的签名:', signature);
+  console.log('  企业微信发送的签名:', msg_signature);
+  console.log('  签名是否匹配:', signature === msg_signature);
+
+  // 验证签名
+  if (signature === msg_signature) {
+    console.log('✅ [验证] 签名匹配成功，返回 echostr:', echostr);
+    return echostr; // 返回 echostr 以通过验证
+  } else {
+    console.error('❌ 企业微信 URL 验证失败：签名不匹配');
+    return null;
+  }
+}
+
+// GET 方法用于企业微信 URL 验证
+export async function GET(request: NextRequest) {
+  const { searchParams } = new URL(request.url);
+
+  const msg_signature = searchParams.get('msg_signature');
+  const timestamp = searchParams.get('timestamp');
+  const nonce = searchParams.get('nonce');
+  const echostr = searchParams.get('echostr');
+
+  console.log('📥 收到企业微信 URL 验证请求:', { msg_signature, timestamp, nonce, echostr });
+
+  // 如果是企业微信的 URL 验证请求
+  if (msg_signature && timestamp && nonce && echostr) {
+    const echostrReturn = verifyWeWorkURL(msg_signature, timestamp, nonce, echostr);
+
+    if (echostrReturn) {
+      console.log('✅ 企业微信 URL 验证成功');
+      return new NextResponse(echostrReturn, {
+        status: 200,
+        headers: {
+          'Content-Type': 'text/plain',
+        },
+      });
+    } else {
+      console.error('❌ 企业微信 URL 验证失败');
+      return NextResponse.json(
+        { error: '验证失败' },
+        { status: 403 }
+      );
+    }
+  }
+
+  // 否则返回服务状态
   return NextResponse.json({
     status: 'running',
     keywords: KEYWORDS,
